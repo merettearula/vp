@@ -1,6 +1,6 @@
 <?php
 	//loen sisse konfiguratsioonifailid
-	require_once "../config.php";
+	require_once "../../config.php";
 	$author_name = "Merette Arula";
 	//echo $author_name;
 	$full_time_now = date("d.m.Y H:i:s");
@@ -103,38 +103,66 @@
 	//echo $weekday_names_et[mt_rand(0, count($weekday_names_et)-1)];
 	//loeme fotode kataloogi sisu
 	
-	$photo_dir = "photos/";
-	//$all_files = scandir($photo _dir);
-	//uus massiv = array_slice(massiiv, mis kohast alates);
-	$all_files = array_slice(scandir($photo_dir), 2);
-	//echo $all_files
+		//loeme fotode kataloogi sisu
+	$photo_dir = "../photos/";
+	//$all_files = scandir($photo_dir);
+	//uus_massiiv = array_slice(massiiv,mis kohast alates);
+	$all_files = array_slice(scandir($photo_dir),2);
+	//echo $all_files;
 	//var_dump($all_files);
-
-	// <img src="kataloog/fail" alt="tekst">
+	
+	//   <img src="kataloog/fail" alt="tekst">
+	$photo_html = null;
+	
 	//tsükkel
-	/*for($i=0;$i < count($all_files); $i ++){
-		echo $all_files[$i] ." ";
+	// muutuja väärtuse suurendamine: $muutuja = $muutuja + 5
+	//$muutuja += 5
+	// kui suureneb 1 võrra $muutuja ++
+	// on ka -=   --
+	/*for($i = 0; $i < count($all_files); $i ++){
+		echo $all_files[$i] ."\n";
 	}*/
-	/*foreach ($all_files as $file_name){
+	/*foreach($all_files as $file_name){
 		echo $file_name ." | ";
 	}*/
 	
-	
-	
-	//loetlen lubatud failitüübid (jpg, png)
-	//MIME tüübid
+	//loetlen lubatud failitüübid  (jpg  png)
+	//   MIME    
 	$allowed_photo_types = ["image/jpeg", "image/png"];
 	$photo_files = [];
-
-	foreach ($all_files as $file_name){
+	foreach($all_files as $file_name){
 		$file_info = getimagesize($photo_dir .$file_name);
-		if (isset($file_info["mime"])){
+		//var_dump($file_info);
+		if(isset($file_info["mime"])){
 			if(in_array($file_info["mime"], $allowed_photo_types)){
-				array_push($photo_files, $file_name); 
+				array_push($photo_files, $file_name);
 			}
 		}
 	}
+	//var_dump($photo_files);
+	$photo_html = '<img src="' .$photo_dir .$photo_files[mt_rand(0, count($photo_files) - 1)] .'" alt="Tallinna pilt">';
 	
+	//vormi info kasutamine
+	// $_POST
+	//var_dump($_POST);
+	$adjective_html = null;
+	if(isset($_POST["todays_adjective_input"]) and !empty($_POST["todays_adjective_input"])){
+		$adjective_html = "<p>Tänase kohta on arvatud: " .$_POST["todays_adjective_input"] .".</p>";
+	}
+	
+	//teen fotode rippmenüü
+	//   <option value="0">tln_1.JPG</option>
+	$select_html = '<option value="" selected disabled>Vali pilt</option>';
+	for($i = 0; $i < count($photo_files); $i ++){
+		$select_html .= '<option value="' .$i .'">';
+		$select_html .= $photo_files[$i];
+		$select_html .= "</option> \n";
+	}
+	
+	if(isset($_POST["photo_select"]) and $_POST["photo_select"] >= 0){
+		//kõik, mis teha tahame ...
+		
+	}
 	
 	//$_POST -> massiiv, sisseehitatud muutuja
 	//var_dump($_POST);
@@ -212,7 +240,7 @@
 	<title><?php echo $author_name?>, veebiprogrammeerimine</title>
 </head>
 <body>
-	<img src="pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">
+	<img src="../pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">
 	<h1><?php echo $author_name ?>, veebiprogrammeerimine</h1>
 	<p>See leht on loodud õppetöö raames ja ei sisalda tõsist informatsiooni. </p>
 	<p> Õppetöö toimus <a href="https://www.tlu.ee">Tallinna Ülikoolis</a> Digitehnoloogiate instituudis.</p>
@@ -220,7 +248,7 @@
 	<p>Praegu on <?php echo $part_of_day?>.</p>
 	<p>Semester edeneb: <?php echo $from_semester_begin_days."/".$semester_duration_days;?></p>
 	<a href="https://www.tlu.ee">
-		<img src="pics/tlu_38.jpg" alt="Tallinna Ülikooli õppehoone">
+		<img src="../pics/tlu_38.jpg" alt="Tallinna Ülikooli õppehoone">
 	</a>
 	<p>Ma olen esimese kursuse informaatika tudeng digitaalse meedia suunal.</p>
 	
