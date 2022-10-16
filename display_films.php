@@ -1,6 +1,22 @@
 <?php
-require_once "../config.php";
-//loome andmebaasiühenduse
+
+session_start();
+	//loen sisse konfiguratsioonifailid
+
+	require_once "fnc_user.php";
+	if(!isset($_SESSION["user_id"])){
+		//jõuga viiakse page.php
+		header("Location: page.php");
+		exit();
+	}
+	//logime välja
+	if(isset($_GET["logout"])){
+		session_destroy();
+		header("Location: page.php");
+		exit();
+	}
+	require_once "header.php";
+
 $conn = new mysqli($server_host, $server_user_name, $server_password, $database);
 //määrame suhtlemisel kasutatava kooditabeli
 $conn->set_charset("utf8");
@@ -41,6 +57,6 @@ while($stmt->fetch()){
 		<img src="pics/tlu_38.jpg" alt="Tallinna Ülikooli õppehoone">
 	</a>
 	<p>Ma olen esimese kursuse informaatika tudeng digitaalse meedia suunal.</p>
-	<?php echo film_html; ?>
+	<?php echo $film_html; ?>
 </body>
 </html>

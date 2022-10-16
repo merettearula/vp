@@ -1,19 +1,37 @@
 <?php
-require_once "../config.php";
-$film_error = null;
-$film = null;
-$title = null;
-$title_error = null;
-$year = null;
-$year_error = null;
-$duration = null;
-$duration_error = null;
-$genre = null;
-$genre_error = null;
-$studio = null;
-$studio_error = null;
-$director = null;
-$director_error = null;
+	session_start();
+	//loen sisse konfiguratsioonifailid
+
+	require_once "fnc_user.php";
+	if(!isset($_SESSION["user_id"])){
+		//jõuga viiakse page.php
+		header("Location: page.php");
+		exit();
+	}
+	//logime välja
+	if(isset($_GET["logout"])){
+		session_destroy();
+		header("Location: page.php");
+		exit();
+	}
+	require_once "header.php";
+
+
+	require_once "../../config.php";
+	$film_error = null;
+	$film = null;
+	$title = null;
+	$title_error = null;
+	$year = null;
+	$year_error = null;
+	$duration = null;
+	$duration_error = null;
+	$genre = null;
+	$genre_error = null;
+	$studio = null;
+	$studio_error = null;
+	$director = null;
+	$director_error = null;
 
 //Kui esineb vigu, siis oleks hea kõiki korrektseid sisestusi ikkagi "meeles pidada" ja neid väljasid siis õigesti täidetuna hoida.
 
@@ -82,6 +100,9 @@ if(isset($_POST["film_submit"])){
 	<title>Merette Arula, veebiprogrammeerimine</title>
 </head>
 <body>
+	<ul>
+		<li>Logi <a href="?logout=1">välja</li>
+	</ul>
 	<h1>Merette Arula, veebiprogrammeerimine</h1>
 	<img src="pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">
 	<p>See leht on loodud õppetöö raames ja ei sisalda tõsist informatsiooni. </p>

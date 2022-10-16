@@ -5,28 +5,35 @@
 		//globaalseid muutujaid hoitakse massiivis $GLOBALS
 		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
 		$conn->set_charset("utf8");
-		$stmt = $conn->prepare("SELECT id, password FROM vp_users WHERE email = ?");
+		$stmt = $conn->prepare("SELECT password FROM vp_users WHERE email = ?");
 		echo $conn->error;
 		$stmt->bind_param("s", $email);
-		$stmt->bind_result($id_from_db, $password_from_db);
+		$stmt->bind_result($password_from_db);
 		$stmt->execute(); 
-		if($stmt->fetch()){
+		if($stmt->fetch()){//teeb tulemused preparetud 
 			//kasutaja on olemas, parool tuli ...
 			if(password_verify($password, $password_from_db)){
-				//parool õige, oleme sees!
-				//määran sessioonimuutujad
-				//$_SESSION -> nii kui teha session_start siis tekib see muutuja
-				$_SESSION["user_id"] = $id_from_db;
 				$stmt->close();
-				$conn->close();
-				header("Location: home.php");
-				//exit();
+				$stmt = $conn->prepare("SELECT id, firstname, lastname FROM vp_users WHERE email = ?");
+				echo $conn->error;
+				$stmt->bind_param("s", $email);
+				$stmt->bind_result($id_from_db, $first_name_from_db, $last_name_from_db);
+				$stmt->execute();
+				if($stmt->fetch()){
+					$_SESSION["user_id"] = $id_from_db;
+					$_SESSION["firstname"] = $first_name_from_db;
+					$_SESSION["lastname"] = $last_name_from_db;
+					header("Location: home.php");
+				} else {
+					$login_error = "Kasutajatunnus või salasõna oli vale";
+				}	
 			} else {
 				$login_error = "Kasutajatunnus või salasõna oli vale!";
 			}
 		} else {
 			$login_error = "Kasutajatunnus või salasõna oli vale!";
 		}
+
 
 		$stmt->close();
 		$conn->close();

@@ -78,13 +78,28 @@
 			}
 			
 			if(isset($_POST["email_input"]) and !empty($_POST["email_input"])){
+				$email_error = null;
 				$email = $_POST["email_input"];
-				if(!filter_var($_POST["email_input"],FILTER_VALIDATE_EMAIL)){
-					$email_error = "Palun kontrolli oma e-posti aadressi!"; 
+				$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+				$conn->set_charset("utf8");
+				$stmt = $conn->prepare("SELECT id FROM vp_users WHERE email = ?");
+				echo $conn->error;
+				$stmt->bind_param("s", $email);
+				$stmt->bind_result($id_from_db);
+				$stmt->execute(); 
+				if($stmt->fetch()){
+					$email_error = "Kasutaja on juba olemas";
+				} else {
+					$stmt->close();
+					$email = $_POST["email_input"];
+				}
+				if(!filter_var($_POST["email_input"], FILTER_VALIDATE_EMAIL)){
+					$email_error = "Palun kontrolli oma e-posti aadress!";
 				}
 			} else {
-				$email_error = "Palun kirjuta oma emailiaadress";
+				$email_error = "Palun kirjuta oma e-posti aadress!";
 			}
+			
 			
 			if(isset($_POST["password_input"]) and !empty($_POST["password_input"])){
 				if(strlen($_POST["password_input"]) < 8) {
