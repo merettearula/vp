@@ -16,6 +16,7 @@
 <ul>
 	<p> Sisse logitud: <?php echo $_SESSION["firstname"]." ".$_SESSION["lastname"]; ?>
 	<li>Logi <a href="?logout=1">välja</li>
+	<li>Fotode galeriisse <a href="gallery_photo_upload.php">lisamine</a></li>
 	<br>
 	<li><a href="add_new_film.php">Siit saad lisada uusi filme</a></li>
 	<li><a href="display_film.php">Vaata lisatud filme</a></li>

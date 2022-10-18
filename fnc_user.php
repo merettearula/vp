@@ -44,13 +44,25 @@
 		$notice = 0;
 		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
 		$conn->set_charset("utf8");
-		$stmt = $conn->prepare("INSERT INTO vp_users (firstname, lastname, birthdate, gender, email, password) VALUES(?,?,?,?,?,?)");
+		$stmt = $conn->prepare("SELECT id FROM vp_users WHERE email = ?");
 		echo $conn->error;
-		//krüpteerimise salasõna
-		$pwd_hash = password_hash($password, PASSWORD_DEFAULT);
-		$stmt->bind_param("sssiss", $first_name, $last_name, $birth_date, $gender, $email, $pwd_hash);
-		if($stmt->execute()){
-			$notice = 1;
+		$stmt->bind_param("s", $email);
+		$stmt->bind_result($id_from_db);
+		$stmt->execute();
+		if($stmt->fetch()){
+			$notice = 2;
+		} else {
+			$stmt->close();
+			$stmt = $conn->prepare("INSERT INTO vp_users (firstname, lastname, birthdate, gender, email, password) VALUES(?,?,?,?,?,?)");
+			echo $conn->error;
+			//krüpteerime salasõna
+			$pwd_hash = password_hash($password, PASSWORD_DEFAULT);
+			$stmt->bind_param("sssiss", $first_name, $last_name, $birth_date, $gender, $email, $pwd_hash);
+			if($stmt->execute()){
+				$notice = 1;
+			} else {
+				$notice = 3;
+			}
 		}
 		//echo $stmt->error;
 		$stmt->close();
