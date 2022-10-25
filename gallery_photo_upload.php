@@ -1,5 +1,8 @@
 <?php 
+	require_once "../../config.php";
+
 	session_start();
+	var_dump($_SESSION);
 	if(!isset($_SESSION["user_id"])){
 		//viiakse page.php
 		header("Location: page.php");
@@ -21,6 +24,8 @@
 	$photo_name_prefix = "vp_";
 	$normal_photo_max_w = 800;
 	$normal_photo_max_h = 450;
+	$thumbnail_max_w = 100;
+	$thumbnail_max_h = 100;
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if(isset($_POST["photo_submit"])){
@@ -52,12 +57,44 @@
 				$normal_photo = resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h);
 				//salvestan väiksemaks tehtud pildi
 				save_photo($normal_photo, "photo_upload_normal/" .$file_name, $file_type);
-				
+								
 				//tõstan ajutise pildifaili oma soovitud kohta
 				move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_original/" .$file_name);
+				
+				$thumbnail_photo = resize_photo_thumbnail($temp_photo, $thumbnail_max_w, $thumbnail_max_h);
+				//salvestan väiksemaks tehtud pildi
+		
+				
+				//tõstan ajutise pildifaili oma soovitud kohta
+				if(save_photo($thumbnail_photo, "photo_upload_thumbnail/" .$file_name, $file_type) and move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_thumbnail/" .$file_name)){
+									
+					$photo_to_db_error = null;
+					$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+					$conn->set_charset("utf8");
+					$stmt = $conn->prepare("INSERT INTO vp_photos (userid, filename, created, alttext, privacy) VALUES(?,?,?,?,?)");
+					echo $conn->error;
+					$stmt->bind_param("isssi", $user_id, $file_name, $created_on, $alttext, $privacy);
+					$stmt->execute();			
+					if($stmt->fetch()){
+						$user_id = $_SESSION["user_id"];
+						$file_name = $file_name;
+						$created_on = date("d.m.Y H:i:s");
+						$alttext = $_POST["alt_input"];
+						$privacy = $_POST["privacy_input"];
+					} else {
+						$photo_to_db_error = "Ei õnnestunud fotot andmebaasi sisestada";
+					}
+					echo $stmt->error;
+					$stmt->close();
+					$conn->close();
+				}
 			} //if empty error
 		} //if photo submit
 	}//if post
+	
+	
+
+	
 	
 	require_once "header.php";
 ?>

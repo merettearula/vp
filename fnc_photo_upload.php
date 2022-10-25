@@ -1,4 +1,6 @@
 <?php
+require_once "../../config.php";
+
 function check_file_type($file){
 	$file_type = 0;
 	$image_check = getimagesize($file);
@@ -52,6 +54,23 @@ function resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h){
 	imagecopyresampled($temp_image, $temp_photo, 0, 0, 0, 0, $new_w, $new_h, $image_w, $image_h);
 	return $temp_image;
 }
+
+function resize_photo_thumbnail($temp_photo, $thumbnail_max_w, $thumbnail_max_h) {
+	$image_w = imagesx($temp_photo);
+	$image_h = imagesy($temp_photo);
+	$new_w_thumbnail = $thumbnail_max_w;
+	$new_h_thumbnail = $thumbnail_max_h;
+	if($image_w / $thumbnail_max_w > $image_h / $thumbnail_max_h){
+		$new_h_thumbnail = round($image_h / ($image_w / $thumbnail_max_w));
+	} else {
+		$new_w_thumbnail = round($image_w / ($image_h / $thumbnail_max_h));
+	}
+	$temp_image = imagecreatetruecolor($new_w_thumbnail, $new_h_thumbnail);
+	//1.mis image objektile, 2.mis objektist, 3-4.mis koordinaatidele x,y, 5.mis koordinaatidelt kärpida/võtta x,y, 6.destination laius kust võtame,7.destination kõrgus kust võtame, 8-9 originaal pildi mõõtmed
+	imagecopyresampled($temp_image, $temp_photo, 0, 0, 0, 0, $new_w_thumbnail, $new_h_thumbnail, $image_w, $image_h);
+	return $temp_image;
+}
+
 function save_photo($photo, $target, $file_type){
 	if($file_type == "jpg"){
 		imagejpeg($photo, $target, 95);
@@ -63,3 +82,4 @@ function save_photo($photo, $target, $file_type){
 		imagegif($photo, $target);
 	}
 }
+

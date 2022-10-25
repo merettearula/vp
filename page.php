@@ -107,7 +107,7 @@
 	//loeme fotode kataloogi sisu
 	
 		//loeme fotode kataloogi sisu
-	$photo_dir = "../photos/";
+	$photo_dir = "photos/";
 	//$all_files = scandir($photo_dir);
 	//uus_massiiv = array_slice(massiiv,mis kohast alates);
 	$all_files = array_slice(scandir($photo_dir),2);
