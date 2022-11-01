@@ -250,7 +250,7 @@
 	<title><?php echo $author_name?>, veebiprogrammeerimine</title>
 </head>
 <body>
-	<img src="../pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">
+	<img src="pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">
 	<h1><?php echo $author_name ?>, veebiprogrammeerimine</h1>
 	<p>See leht on loodud õppetöö raames ja ei sisalda tõsist informatsiooni. </p>
 	<hr>
@@ -267,7 +267,7 @@
 	<p>Praegu on <?php echo $part_of_day?>.</p>
 	<p>Semester edeneb: <?php echo $from_semester_begin_days."/".$semester_duration_days;?></p>
 	<a href="https://www.tlu.ee">
-		<img src="../pics/tlu_38.jpg" alt="Tallinna Ülikooli õppehoone">
+		<img src="pics/tlu_38.jpg" alt="Tallinna Ülikooli õppehoone">
 	</a>
 	<p>Ma olen esimese kursuse informaatika tudeng digitaalse meedia suunal.</p>
 	

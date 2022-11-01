@@ -83,3 +83,17 @@ function save_photo($photo, $target, $file_type){
 	}
 }
 
+function store_photo_data($file_name, $alt, $privacy){
+	$notice = null;
+	$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+	$conn->set_charset("utf8");
+	$stmt = $conn->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES (?, ?, ?, ?)");
+	echo $conn->error;
+	$stmt->bind_param("issi", $_SESSION["user_id"], $file_name, $alt, $privacy);
+	if($stmt->execute() == false){
+	  $notice = 1;
+	}
+	$stmt->close();
+	$conn->close();
+	return $notice;
+}

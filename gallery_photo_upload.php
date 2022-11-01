@@ -2,7 +2,7 @@
 	require_once "../../config.php";
 
 	session_start();
-	var_dump($_SESSION);
+	
 	if(!isset($_SESSION["user_id"])){
 		//viiakse page.php
 		header("Location: page.php");
@@ -21,16 +21,16 @@
 	$photo_error = null;
 	$file_name = null;
 	$photo_file_size_limit = 1.5 * 1024 * 1024;
-	$photo_name_prefix = "vp_";
 	$normal_photo_max_w = 800;
 	$normal_photo_max_h = 450;
-	$thumbnail_max_w = 100;
-	$thumbnail_max_h = 100;
+	$user_id = null;
+	$created_on = null;
+	$alttext = null;
+	$privacy = null;
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if(isset($_POST["photo_submit"])){
 			//var_dump($_POST);
-			var_dump($_FILES["photo_input"]);
 			//kas on üldse pildifail ja mis tüüpi
 			if(isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])){
 				$file_type = check_file_type($_FILES["photo_input"]["tmp_name"]);
@@ -61,39 +61,49 @@
 				//tõstan ajutise pildifaili oma soovitud kohta
 				move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_original/" .$file_name);
 				
-				$thumbnail_photo = resize_photo_thumbnail($temp_photo, $thumbnail_max_w, $thumbnail_max_h);
+				$thumbnail_photo = resize_photo_thumbnail($temp_photo, $thumbnail_photo_w, $thumbnail_photo_h);
 				//salvestan väiksemaks tehtud pildi
 		
 				
 				//tõstan ajutise pildifaili oma soovitud kohta
-				if(save_photo($thumbnail_photo, "photo_upload_thumbnail/" .$file_name, $file_type) and move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_thumbnail/" .$file_name)){
-									
-					$photo_to_db_error = null;
-					$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
-					$conn->set_charset("utf8");
-					$stmt = $conn->prepare("INSERT INTO vp_photos (userid, filename, created, alttext, privacy) VALUES(?,?,?,?,?)");
-					echo $conn->error;
-					$stmt->bind_param("isssi", $user_id, $file_name, $created_on, $alttext, $privacy);
-					$stmt->execute();			
-					if($stmt->fetch()){
-						$user_id = $_SESSION["user_id"];
-						$file_name = $file_name;
-						$created_on = date("d.m.Y H:i:s");
-						$alttext = $_POST["alt_input"];
-						$privacy = $_POST["privacy_input"];
-					} else {
-						$photo_to_db_error = "Ei õnnestunud fotot andmebaasi sisestada";
-					}
-					echo $stmt->error;
-					$stmt->close();
-					$conn->close();
+				save_photo($thumbnail_photo, "photo_upload_thumbnail/" .$file_name, $file_type);
+				move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_thumbnail/" .$file_name);
+								
+				$photo_to_db_error = null;
+				$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+				$conn->set_charset("utf8");
+				$stmt = $conn->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES(?,?,?,?)");
+				echo $conn->error;			
+				
+				$user_id = $_SESSION["user_id"];
+				$file_name = $file_name;
+				//$created_on = microtime(1)*10000;
+				$alt = $_POST["alt_input"];
+				$privacy = $_POST["privacy_input"];
+				
+				/*if(!empty($user_id) and !empty($file_name) and !empty($alttext) and !empty($privacy)){
+					$stmt->bind_param("issi", $user_id, $file_name, $alttext, $privacy);
+					$stmt->execute();
+				} else {
+					$photo_to_db_error = "Ei õnnestunud fotot andmebaasi sisestada";
+				}*/
+				if(empty($photo_error)){
+					$photo_error = store_photo_data($file_name, $alt, $privacy);
 				}
+				if(empty($photo_error)){
+					$photo_error = "Pilt edukalt üles laetud!";
+					$alt = null;
+					$privacy = 1;
+				} else {
+					$photo_error = "Pildi üleslaadimisel tekkis tõrkeid!";
+				}
+				echo $stmt->error;
+				$stmt->close();
+				$conn->close();
+				
 			} //if empty error
 		} //if photo submit
 	}//if post
-	
-	
-
 	
 	
 	require_once "header.php";
@@ -124,7 +134,10 @@
 		<input type="submit" name="photo_submit" id="photo_submit" value="Lae üles">
 		<span><?php echo $photo_error;?>
 	</form>
-	
+	<hr>
+	<a href="gallery_public.php">Vaata lisatud pilte</a>
 </ul>
 
 <?php require_once "footer.php"; ?>
+
+
