@@ -31,14 +31,43 @@
 			$alt = test_input($_POST["alt_input"]);
 			$privacy = filter_var($_POST["privacy_input"], FILTER_VALIDATE_INT);
 			//andmete uuendamise osa
+			$id = $_POST["photo_input"];
+            $photo_error = edit_own_photo_data($alt, $privacy, $id);
+			if(empty($photo_error)){
+				$photo_error = "Andmed muudetud!";
+			} else {
+				$photo_error = "Pildi andmeid ei õnnestunud muuta!";
 		} //if photo submit
-	}//if post
+	} else {
+		$photo_error = "Pildi andmeid ei saanud muuta";
+		}//if post
+	}
+	
+	
+	
+	if(isset($_POST["photo_delete_submit"])) {
+		//mida me siin kontrollime?
+		if(isset($_POST["photo_input"]) and filter_var($_POST["photo_input"], FILTER_VALIDATE_INT)){
+			$id = filter_var($_POST["photo_input"], FILTER_VALIDATE_INT);
+			$photo_error = delete_own_photo_data($id);
+			if (empty($photo_error)) {
+				$photo_error = "Pilt sai kustutatud";
+			} else {
+				$photo_error = "Pole luba pilti kustutada. Saate kustutada vaid enda faile.";
+			} 
+		} else {
+		$photo_error = "Pilti ei saanud kustutada";
+		}
+	}
+	
+	echo $photo_error;
 	
 	if(isset($_GET["id"]) and !empty($_GET["id"]) and filter_var($_GET["id"], FILTER_VALIDATE_INT)) {
 		$photo_data = read_own_photo_data($_GET["id"]);
 		$alt = $photo_data["alt"];
 		$privacy = $photo_data["privacy"];	
 	}
+
 	
 	require_once "header.php";
 ?>
@@ -46,6 +75,9 @@
 	<p> Sisse logitud: <?php echo $_SESSION["firstname"]." ".$_SESSION["lastname"]; ?>
 	<li>Logi <a href="?logout=1">välja</li>
 	<li>Tagasi avalehele <a href="home.php"></a></li>
+	<li><a href="<?php echo "gallery_own.php?=page" .$_SESSION["gallery_own_page"]; ?>">Tagasi oma fotode galeriisse</a></li>
+	
+	
 </ul>
 	<hr>
 	<h2>Fotode andmete muutmine</h2>
@@ -54,7 +86,7 @@
 	echo '<img src="' .$gallery_photo_normal_folder .$photo_data["filename"] .'" alt="' .$alt .'">' ."\n";
 	?>
 	<br>
-	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ."?id=" .$id;?>">
 		<input type="hidden" name="photo_input" id="photo_input" value="<?php echo $_GET["id"]; ?> ">
 		<br>
 		<label for="alt_input">Alternatiivtekst (alt): </label>
@@ -73,7 +105,15 @@
 		<span><?php echo $photo_error;?> 
 	</form>
 	<hr>
+	<!-- Lisan kustutamise formi -->
+	<form method="POST" action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]);?>">
+		<input type="hidden" name="photo_input" value="<?php echo $_GET["id"]; ?>">
+		<input type="submit" name="photo_delete_submit" id="photo_delete_submit" value="Kustuta">
+	</form>
+	<hr>
 	<a href="gallery_public.php">Vaata lisatud pilte</a>
+	<hr>
+	
 </ul>
 
 <?php require_once "footer.php"; ?>

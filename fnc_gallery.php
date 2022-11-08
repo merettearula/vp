@@ -111,3 +111,83 @@
 		$conn->close();
 		return $photo_data;
 	}
+
+	function edit_own_photo_data($alt, $privacy, $id){
+			$photo_error = null;
+			$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+			$conn->set_charset("utf8");
+			$stmt = $conn->prepare("SELECT userid FROM vp_photos WHERE id = ?");
+			$stmt->bind_param("i", $id);
+			$stmt->bind_result($userid_from_db);
+			$stmt->execute();
+			if($stmt->fetch()){
+				if($userid_from_db == $_SESSION["user_id"]){
+					$stmt->close();
+					$stmt = $conn->prepare("UPDATE vp_photos SET alttext = ?, privacy = ? WHERE id = ?");
+					echo $conn->error;
+					$stmt->bind_param("sii", $alt, $privacy, $id);
+					if($stmt->execute() == false){
+						$photo_error = 1;
+					}
+					$stmt->close();
+					$conn->close();
+					return $photo_error;
+					exit();
+				}
+			}
+			header("Location: gallery_own.php");
+			exit();
+	}
+	
+	function delete_own_photo_data($id){
+	$photo_error = null;
+		$conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+		$stmt = $conn->prepare("SELECT userid FROM vp_photos WHERE id = ?");
+		$stmt->bind_param("i", $id);
+		$stmt->bind_result($userid_from_db);
+		$stmt->execute();
+		if($stmt->fetch()){
+			if($userid_from_db == $_SESSION["user_id"]){
+				$stmt->close();
+				$stmt = $conn->prepare("UPDATE vp_photos SET deleted = now() WHERE id = ?");
+				echo $conn->error;
+				$stmt->bind_param("i", $id);
+				if($stmt->execute() == false){
+					$photo_error = 1;
+				}
+				$stmt->close();
+				$conn->close();
+				return $photo_error;
+				exit();
+			}
+		}
+		header("Location: gallery_own.php");
+		exit();
+	}
+	function show_public_photo(){
+		$photo_html = null;
+        $privacy = 3;
+        $conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
+		$conn->set_charset("utf8");
+        $stmt = $conn->prepare("SELECT filename, alttext FROM vp_photos WHERE id = (SELECT MAX(id) FROM vp_photos WHERE privacy = ? AND deleted IS NULL)");
+        echo $conn->error;
+        $stmt->bind_param("i", $privacy);
+        $stmt->bind_result($filename_from_db, $alttext_from_db);
+        $stmt->execute();
+        if($stmt->fetch()){
+            //<img src="kataloog/fail" alt="tekst">
+            $photo_html = '<img src="' .$GLOBALS["gallery_photo_normal_folder"] .$filename_from_db .'" alt="';
+            if(empty($alttext_from_db)){
+                $photo_html .= "Üleslaetud foto";
+            } else {
+                $photo_html .= $alttext_from_db;
+            }
+            $photo_html .= '">' ."\n";
+        } else {
+            $photo_html = "<p>Kahjuks pole ühtegi avalikku fotot üles laetud!</p>";
+        }
+        $stmt->close();
+		$conn->close();
+		return $photo_html;
+    }

@@ -2,7 +2,7 @@
 	//algatan sessiooni
 	session_start();
 	//loen sisse konfiguratsioonifailid
-
+	require_once "fnc_gallery.php";
 	require_once "fnc_user.php";
 	$author_name = "Merette Arula";
 	//echo $author_name;
@@ -242,6 +242,7 @@
     }
 	
 	
+	
 ?>
 <!DOCTYPE html>
 <html>
@@ -263,6 +264,8 @@
 	<p><a href="add_user.php">Loo omale kasutaja</a></p>
 	<hr>
 	<p> Õppetöö toimus <a href="https://www.tlu.ee">Tallinna Ülikoolis</a> Digitehnoloogiate instituudis.</p>
+	<h2>Kasutaja üleslaetud foto</h2>
+	<?php echo show_public_photo();?>
 	<p> Lehe avamise hetk: <?php echo $weekday_names_et[$weekday_now-1].", ".$full_time_now;?>.</p>
 	<p>Praegu on <?php echo $part_of_day?>.</p>
 	<p>Semester edeneb: <?php echo $from_semester_begin_days."/".$semester_duration_days;?></p>
@@ -299,6 +302,6 @@
 		<?php echo $select_html; ?>
 		</select>
 		<input type="submit" id="photo_submit" name="photo_submit" value="OK">
-		<?php echo $photo_html; 
+		<?php echo $photo_html;
 			require_once "footer.php";
 		?>

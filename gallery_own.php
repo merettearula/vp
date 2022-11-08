@@ -28,7 +28,9 @@
 		$page = $_GET["page"];
 	}
 	
-	$style_sheets = "styles/gallery.css";
+	$_SESSION["gallery_own_page"] = $page;
+	
+	$style_sheets = ["styles/gallery.css"];
 	require_once "header.php";
 	
 	echo "<p>Sisse loginud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] .".</p> \n";
