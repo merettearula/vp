@@ -37,7 +37,7 @@
 			//var_dump($_POST);
 			//kas on üldse pildifail ja mis tüüpi
 			if(isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])){
-				$this->file_type = check_file_type($_FILES["photo_input"]["tmp_name"]);
+				$file_type = check_file_type($_FILES["photo_input"]["tmp_name"]);
 				if($file_type==0){
 					$photo_error = "Valitud fail pole sobivat tüüpi";
 				}
@@ -60,8 +60,14 @@
 				$upload = new Photoupload($_FILES["photo_input"]);
 				
 				
+				//loome pikslikogumi ehk image objekti
+				//$temp_photo = create_image($_FILES["photo_input"]["tmp_name"], $file_type);
+				//teeme väiksemaks
+				//$normal_photo = resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h);
 				$upload->resize_photo($normal_photo_max_w, $normal_photo_max_h);
 				
+				//salvestan väiksemaks tehtud pildi
+				//save_photo($normal_photo, "photo_upload_normal/" .$file_name, $file_type);
 				
 				$upload->save_photo($gallery_photo_normal_folder .$file_name, $upload->file_type);
 				
@@ -101,7 +107,9 @@
 				}
 				if(empty($upload->error)){
 					// ajutine fail: $_FILES["photo_input"]["tmp_name"]
-					$upload->move_original_photo($gallery_photo_original_folder .$file_name);
+					if(move_uploaded_file($_FILES["photo_input"]["tmp_name"], $gallery_photo_original_folder .$file_name) == false){
+						$photo_error = 1;
+					}
 				}
 				if(empty($upload->error)){
 					$photo_error = store_photo_data($file_name, $alt, $privacy);

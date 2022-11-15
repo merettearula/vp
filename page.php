@@ -4,6 +4,16 @@
 	//loen sisse konfiguratsioonifailid
 	require_once "fnc_gallery.php";
 	require_once "fnc_user.php";
+	//klass
+	/*require_once "classes/Example.class.php";
+	$our_example = new Example(3);
+	$my_example = new Example(5);
+	echo $our_example->known_value ."<br>";
+	//käivitan example funktisiooni add
+	$my_example->add();
+	unset($our_example);
+	unset($my_example);*/
+
 	$author_name = "Merette Arula";
 	//echo $author_name;
 	$full_time_now = date("d.m.Y H:i:s");

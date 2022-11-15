@@ -1,7 +1,7 @@
 <?php
 require_once "../../config.php";
 
-function check_file_type($file){
+/*function check_file_type($file){
 	$file_type = 0;
 	$image_check = getimagesize($file);
 	if($image_check !== false){
@@ -16,28 +16,30 @@ function check_file_type($file){
 		}
 	}
 	return $file_type;
-}
+}*/
 
 function create_filename($photo_name_prefix, $file_type) {
 	//väljendab praegust ajahetke
 	$timestamp = microtime(1)*10000;
 	return $photo_name_prefix .$timestamp .".".$file_type;
 }
+//klassi
+// function create_image($file, $file_type){
+	// $temp_image = null;
+	// if($file_type == "jpg"){
+		// $temp_image = imagecreatefromjpeg($file);
+	// }
+	// if($file_type == "png"){
+		// $temp_image = imagecreatefrompng($file);
+	// }
+	// if($file_type == "gif"){
+		// $temp_image = imagecreatefromgif($file);
+	// }
+	// return $temp_image;
+// }
 
-function create_image($file, $file_type){
-	$temp_image = null;
-	if($file_type == "jpg"){
-		$temp_image = imagecreatefromjpeg($file);
-	}
-	if($file_type == "png"){
-		$temp_image = imagecreatefrompng($file);
-	}
-	if($file_type == "gif"){
-		$temp_image = imagecreatefromgif($file);
-	}
-	return $temp_image;
-}
-function resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h){
+//klass
+/*function resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h){
 	//originaal pildi suurus
 	$image_w = imagesx($temp_photo);
 	$image_h = imagesy($temp_photo);
@@ -54,7 +56,7 @@ function resize_photo($temp_photo, $normal_photo_max_w, $normal_photo_max_h){
 	imagecopyresampled($temp_image, $temp_photo, 0, 0, 0, 0, $new_w, $new_h, $image_w, $image_h);
 	return $temp_image;
 }
-
+//klass
 function resize_photo_thumbnail($temp_photo, $thumbnail_max_w, $thumbnail_max_h) {
 	$image_w = imagesx($temp_photo);
 	$image_h = imagesy($temp_photo);
@@ -69,8 +71,9 @@ function resize_photo_thumbnail($temp_photo, $thumbnail_max_w, $thumbnail_max_h)
 	//1.mis image objektile, 2.mis objektist, 3-4.mis koordinaatidele x,y, 5.mis koordinaatidelt kärpida/võtta x,y, 6.destination laius kust võtame,7.destination kõrgus kust võtame, 8-9 originaal pildi mõõtmed
 	imagecopyresampled($temp_image, $temp_photo, 0, 0, 0, 0, $new_w_thumbnail, $new_h_thumbnail, $image_w, $image_h);
 	return $temp_image;
-}
-
+}*/
+//klassi
+/*
 function save_photo($photo, $target, $file_type){
 	if($file_type == "jpg"){
 		imagejpeg($photo, $target, 95);
@@ -81,7 +84,7 @@ function save_photo($photo, $target, $file_type){
 	if($file_type == "gif") {
 		imagegif($photo, $target);
 	}
-}
+}*/
 
 function store_photo_data($file_name, $alt, $privacy){
 	$notice = null;

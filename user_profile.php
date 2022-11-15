@@ -13,13 +13,20 @@
 		exit();
 	}
 	
-	if(isset($_POST["color_submit"]) and !empty($_POST["color_submit"])) {
-		$userid = $_SESSION["user_id"];
+	if(isset($_POST["color_submit"]) and !empty(isset($_POST["color_submit"]))){
 		$description = $_POST["user_description"];
 		$bgcolor = $_POST["bg_color_input"];
 		$txtcolor = $_POST["txt_color_input"];
-		echo profile_colors($userid, $description, $bgcolor, $txtcolor);
-	}
+		echo profile_colors($description, $bgcolor, $txtcolor);
+	 }
+
+	if($_POST["profile_input"] == $_SESSION["user_id"]) {
+		$colors = read_colors($_SESSION["user_id"]);
+		echo $color_data;
+	} 
+	/*if(isset($_POST["color_submit"]) and !empty($_POST["color_submit"]))*/
+	
+	
 	
 	require_once "header.php";
 ?>
