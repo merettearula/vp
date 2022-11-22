@@ -1,7 +1,9 @@
 <?php 
 	require_once "../../config.php";
 
-	session_start();
+	require_once "classes/SessionManager.class.php";
+	//järgnev rida tõmbab käima static funktsiooni
+	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	
 	if(!isset($_SESSION["user_id"])){
 		//viiakse page.php

@@ -1,6 +1,9 @@
 <?php
 	//algatan sessiooni
-	session_start();
+	//session_start();
+	require_once "classes/SessionManager.class.php";
+	//järgnev rida tõmbab käima static funktsiooni
+	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	//loen sisse konfiguratsioonifailid
 	require_once "fnc_gallery.php";
 	require_once "fnc_user.php";

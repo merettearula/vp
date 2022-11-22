@@ -1,6 +1,8 @@
 <?php 
 	
-	session_start();
+	require_once "classes/SessionManager.class.php";
+	//järgnev rida tõmbab käima static funktsiooni
+	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	
 	if(!isset($_SESSION["user_id"])){
 		//viiakse page.php
@@ -15,13 +17,14 @@
 	}
 	
 	require_once "fnc_photo_upload.php";
+	require_once "fnc_general.php";
 	require_once "../../config.php";
 	require_once "classes/Photoupload.class.php";
 	
 	//kontrollin pildi valikud
 	$file_type = null;
 	$photo_error = null;
-	$file_name = null;
+	//$file_name = null;
 	$photo_file_size_limit = 1.5 * 1024 * 1024;
 	$normal_photo_max_w = 800;
 	$normal_photo_max_h = 450;
@@ -29,111 +32,60 @@
 	$created_on = null;
 	$alttext = null;
 	$privacy = null;
+	$watermark = "pics/vp_logo_w100_overlay.png";
 	
 	//echo $normal_photo_max_w;
 	
 	if($_SERVER["REQUEST_METHOD"] == "POST"){
 		if(isset($_POST["photo_submit"])){
-			//var_dump($_POST);
-			//kas on üldse pildifail ja mis tüüpi
+			$alt = test_input($_POST["alt_input"]);
+			$privacy = filter_var($_POST["privacy_input"], FILTER_VALIDATE_INT);
+			
 			if(isset($_FILES["photo_input"]["tmp_name"]) and !empty($_FILES["photo_input"]["tmp_name"])){
-				$this->file_type = check_file_type($_FILES["photo_input"]["tmp_name"]);
-				if($file_type==0){
-					$photo_error = "Valitud fail pole sobivat tüüpi";
-				}
-			} else {
-				$photo_error = "Pildifail on valimata";
-			}
-			//faili suurus
-			if(empty($photo_error)){
-				if($_FILES["photo_input"]["size"]>$photo_file_size_limit){
-					$photo_error = "Valitud fail on liiga suur";
-				}
-			}
-			if(empty($photo_error)){
-				
-				//loon uue failinime
-				$file_name = create_filename($photo_name_prefix, $file_type);
-				//teen väiksema normaalmõõdus pildi
-				
-				//klass
 				$upload = new Photoupload($_FILES["photo_input"]);
-				
-				
-				$upload->resize_photo($normal_photo_max_w, $normal_photo_max_h);
-				
-				
-				$upload->save_photo($gallery_photo_normal_folder .$file_name, $upload->file_type);
-				
-				// //tõstan ajutise pildifaili oma soovitud kohta
-				// move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_original/" .$file_name);
-				
-				// $thumbnail_photo = resize_photo_thumbnail($temp_photo, $thumbnail_photo_w, $thumbnail_photo_h);
-				// //salvestan väiksemaks tehtud pildi
-		
-				
-				// //tõstan ajutise pildifaili oma soovitud kohta
-				// save_photo($thumbnail_photo, "photo_upload_thumbnail/" .$file_name, $file_type);
-				// move_uploaded_file($_FILES["photo_input"]["tmp_name"], "photo_upload_thumbnail/" .$file_name);
-								
-				// $photo_to_db_error = null;
-				// $conn = new mysqli($GLOBALS["server_host"], $GLOBALS["server_user_name"], $GLOBALS["server_password"], $GLOBALS["database"]);
-				// $conn->set_charset("utf8");
-				// $stmt = $conn->prepare("INSERT INTO vp_photos (userid, filename, alttext, privacy) VALUES(?,?,?,?)");
-				// echo $conn->error;			
-				
-				$user_id = $_SESSION["user_id"];
-				$file_name = $file_name;
-				//$created_on = microtime(1)*10000;
-				$alt = $_POST["alt_input"];
-				$privacy = $_POST["privacy_input"];
-				
-				/*if(!empty($user_id) and !empty($file_name) and !empty($alttext) and !empty($privacy)){
-					$stmt->bind_param("issi", $user_id, $file_name, $alttext, $privacy);
-					$stmt->execute();
-				} else {
-					$photo_to_db_error = "Ei õnnestunud fotot andmebaasi sisestada";
-				}*/
 				if(empty($upload->error)){
-					//$photo_error = store_photo_data($file_name, $alt, $privacy);
+					$upload->check_file_size($photo_file_size_limit);
+				}
+				if(empty($upload->error)){
+					$upload->create_filename($photo_name_prefix);
+				}
+				if(empty($upload->error)){
+					$upload->resize_photo($normal_photo_max_w, $normal_photo_max_h);
+					//lisan vesimärgi
+					$upload->add_watermark($watermark);
+					$upload->save_photo($gallery_photo_normal_folder .$upload->file_name);
+				}
+				if(empty($upload->error)){
 					$upload->resize_photo($thumbnail_photo_w, $thumbnail_photo_h, false);
-					$upload->save_photo($gallery_photo_thumbnail_folder .$file_name, $upload->file_type);
+					$upload->save_photo($gallery_photo_thumbnail_folder .$upload->file_name);
 				}
 				if(empty($upload->error)){
-					// ajutine fail: $_FILES["photo_input"]["tmp_name"]
-					$upload->move_original_photo($gallery_photo_original_folder .$file_name);
+					$upload->move_original_photo($gallery_photo_original_folder .$upload->file_name);
 				}
 				if(empty($upload->error)){
-					$photo_error = store_photo_data($file_name, $alt, $privacy);
+					$photo_error = store_photo_data($upload->file_name, $alt, $privacy);
 				}
-				if(empty($photo_error)){
+				if(empty($photo_error) and empty($upload->error)){
 					$photo_error = "Pilt edukalt üles laetud!";
 					$alt = null;
 					$privacy = 1;
 				} else {
-					$photo_error = "Pildi üleslaadimisel tekkis tõrkeid!";
+					$photo_error .= $upload->error;
 				}
-				
 				unset($upload);
-				
-				// if(empty($photo_error)){
-					// $photo_error = "Pilt edukalt üles laetud!";
-					// $alt = null;
-					// $privacy = 1;
-				// } else {
-					// $photo_error = "Pildi üleslaadimisel tekkis tõrkeid!";
-				// }
-				// echo $stmt->error;
-				// $stmt->close();
-				// $conn->close();
-				
-			} //if empty error
-		} //if photo submit
-	}//if post
-	
+
+			} else {
+				$photo_error = "Pildifail on valimata!";
+			}
+			
+		}//if photo_submit
+	}//if POST
 	
 	require_once "header.php";
+	
+	echo "<p>Sisse loginud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] .".</p> \n";
 ?>
+
 <ul>
 	<p> Sisse logitud: <?php echo $_SESSION["firstname"]." ".$_SESSION["lastname"]; ?>
 	<li>Logi <a href="?logout=1">välja</li>

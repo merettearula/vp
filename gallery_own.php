@@ -1,5 +1,7 @@
 <?php
-	session_start();
+	require_once "classes/SessionManager.class.php";
+	//järgnev rida tõmbab käima static funktsiooni
+	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	//kontrollin, kas oleme sisse loginud
 	if(!isset($_SESSION["user_id"])){
 		header("Location: page.php");

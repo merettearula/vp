@@ -1,5 +1,7 @@
 <?php 
-	session_start();
+	require_once "classes/SessionManager.class.php";
+	//järgnev rida tõmbab käima static funktsiooni
+	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	if(!isset($_SESSION["user_id"])){
 		//jõuga viiakse page.php
 		header("Location: page.php");
@@ -11,7 +13,26 @@
 		header("Location: page.php");
 		exit();
 	}
+	//tegelen küpsistega
+	
+	$last_visitor = "Pole teada";
+	
+	if((isset($_COOKIE["lastvisitor"])) and !empty($_COOKIE["lastvisitor"])){
+		$last_visitor = $_COOKIE["lastvisitor"];
+	}
+	
+	//salvestan küpsise 
+	//nimi, väärtust, aegumistähtaeg, veebikataloog, domeen, https kasutamine,
+	//https isset($_SERVER["HTTPS"])
+	setcookie("lastvisitor", $_SESSION["firstname"] ." " .$_SESSION["lastname"], time()+ (60 * 60 * 24 * 8), "~arulmere/vp/", "greeny.cs.tlu.ee", true, true);
+	//küpsise kustutamine: expire ehk aegumistähtaeg pannakse minevikus time() - 3000
+	
 	require_once "header.php";
+	
+	//echo "<p>Sisse loginud: " $_SESSION["firstname"]." ".$_SESSION["lastname"] .".</p> \n";
+	if($last_visitor != $_SESSION["firstname"]." ".$_SESSION["lastname"]){
+		echo "<p> Viimati oli sisse loginud: " .$last_visitor ."</p> \n";
+	}
 ?>
 <ul>
 	<p> Sisse logitud: <?php echo $_SESSION["firstname"]." ".$_SESSION["lastname"]; ?>

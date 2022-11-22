@@ -17,12 +17,12 @@ require_once "../../config.php";
 	}
 	return $file_type;
 }*/
-
-function create_filename($photo_name_prefix, $file_type) {
-	//väljendab praegust ajahetke
-	$timestamp = microtime(1)*10000;
-	return $photo_name_prefix .$timestamp .".".$file_type;
-}
+//klassi
+// function create_filename($photo_name_prefix, $file_type) {
+	// //väljendab praegust ajahetke
+	// $timestamp = microtime(1)*10000;
+	// return $photo_name_prefix .$timestamp .".".$file_type;
+// }
 //klassi
 // function create_image($file, $file_type){
 	// $temp_image = null;
@@ -94,7 +94,7 @@ function store_photo_data($file_name, $alt, $privacy){
 	echo $conn->error;
 	$stmt->bind_param("issi", $_SESSION["user_id"], $file_name, $alt, $privacy);
 	if($stmt->execute() == false){
-	  $notice = 1;
+	  $notice = "Pildi andmebaasi salvestamine ebaõnnestus";
 	}
 	$stmt->close();
 	$conn->close();
