@@ -4,21 +4,27 @@
 	<meta charset="utf-8">
 	<title> Merette Arula, veebiprogrammeerimine</title>
 	<style>
-		body {
+		body{
 			background-color: <?php echo $_SESSION["user_bg_color"]; ?>;
 			color: <?php echo $_SESSION["user_txt_color"]; ?>;
-			
 		}
 	</style>
+	<?php
 	
-	<?php 
-        if(isset($style_sheets) and !empty($style_sheets)){
-			//<link rel="stylesheet" href="styles/gallery.css">
+		if(isset($style_sheets) and !empty($style_sheets)){
 			foreach($style_sheets as $style){
+			//<link rel="stylesheet" href="styles/gallery.css">
 				echo '<link rel="stylesheet" href="' .$style .'">' ."\n";
 			}
 		}
+		if(isset($javascripts) and !empty($javascripts)){
+			foreach($javascripts as $js){
+			//<link rel="stylesheet" href="styles/gallery.css">
+				echo '<script src="' .$js .'" defer></script>' ."\n";
+			}
+		}
 	?>
+</head>
 </head>
 <body>
 	<img src="pics/vp_banner_gs.png" alt="Veebiprogrammeerimine">

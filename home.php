@@ -1,5 +1,7 @@
 <?php 
 	require_once "classes/SessionManager.class.php";
+	require_once "fnc_photo_upload.php";
+	require_once "fnc_user.php";
 	//järgnev rida tõmbab käima static funktsiooni
 	SessionManager::sessionStart("vp", 0, "~arulmere/vp/", "greeny.cs.tlu.ee");
 	if(!isset($_SESSION["user_id"])){
@@ -44,6 +46,9 @@
 	<li><a href="read_daycomments.php">Vaata lisatud päevakommentaare</a></li>
 	<li><a href="gallery_public.php">Vaata lisatud pilte</a></li>
 	<li><a href="gallery_own.php">Minu fotod</a></li>
+	<li><a href="user_profile.php">Muuda kasutajaprofiili</a></li>
 </ul>
+<h2>Minu profiil</h2>
+<?php echo read_pfp(); ?>
 
 <?php require_once "footer.php"; ?>

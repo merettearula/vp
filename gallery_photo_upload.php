@@ -67,8 +67,6 @@
 				}
 				if(empty($photo_error) and empty($upload->error)){
 					$photo_error = "Pilt edukalt üles laetud!";
-					$alt = null;
-					$privacy = 1;
 				} else {
 					$photo_error .= $upload->error;
 				}
@@ -81,13 +79,17 @@
 		}//if photo_submit
 	}//if POST
 	
+	//htmli sidumine javascriptiga->tavaliselt päises "headis"
+	//<script>src="javascript.js" defer</script>
+	
+	$javascripts = ["javascript/check_file_size.js"];
+	
 	require_once "header.php";
 	
 	echo "<p>Sisse loginud: " .$_SESSION["firstname"] ." " .$_SESSION["lastname"] .".</p> \n";
 ?>
 
 <ul>
-	<p> Sisse logitud: <?php echo $_SESSION["firstname"]." ".$_SESSION["lastname"]; ?>
 	<li>Logi <a href="?logout=1">välja</li>
 	<li>Tagasi avalehele <a href="home.php"></a></li>
 </ul>
@@ -110,7 +112,7 @@
 		<label for="privacy_input_3">Avalik (kõik näevad)</label>
 		<br>
 		<input type="submit" name="photo_submit" id="photo_submit" value="Lae üles">
-		<span><?php echo $photo_error;?>
+		<span id="infoPlace"> <?php echo $photo_error;?>
 	</form>
 	<hr>
 	<a href="gallery_public.php">Vaata lisatud pilte</a>
